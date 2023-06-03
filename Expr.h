@@ -33,7 +33,7 @@ OprType tokenOprType(Token *token)
     return 0;
 }
 
-Expr *exprAppend(Expr *head, Expr *tail)
+Expr* exprAppend(Expr *head, Expr *tail)
 {
     if(!head)
         return tail;
@@ -42,6 +42,17 @@ Expr *exprAppend(Expr *head, Expr *tail)
         cur = cur->next;
     cur->next = tail;
     return head;
+}
+
+void exprFree(Expr *expr)
+{
+    while(expr){
+        if(expr->type == EXP_OPR)
+            exprFree(expr->ops);
+        Expr *next = expr->next;
+        free(expr);
+        expr = next;
+    }
 }
 
 Expr* exprParseSub(Token **tokens)
@@ -82,41 +93,8 @@ Expr* exprParseSub(Token **tokens)
 
 Expr* exprParse(Token *tokens)
 {
-
-    Expr *head = NULL;
-    Expr *expr = NULL;
-    while(tokens->type != TOK_END){
-        expr = calloc(1, sizeof(Expr));
-        switch(tokens->type){
-            case TOK_NUM:;
-                char *end = NULL;
-                const ul nat = strtoul(tokens->token, &end, 10);
-                assertExpr(nat < 8*sizeof(int));
-                expr->token = tokens;
-                expr->type = EXP_NUM;
-                expr->num = (int)nat;
-                break;
-            case TOK_LP:
-                tokens = tokens->next;
-                assertExpr(tokens != NULL);
-                expr = exprParseSub(&tokens);
-                assertExpr(tokens->type == TOK_RP);
-                tokens = tokens->next;
-                break;
-            default:
-                // expr->type = EXP_OPR;
-                // expr->token = tokens;
-                // expr->opr = tokenOprType(tokens);
-                // expr->ops =
-                // expr->
-                panic("uhoh :( type: %s", TokenTypeStr[tokens->type]);
-                break;
-        }
-        head = exprAppend(head, expr);
-        tokens = tokens->next;
-    }
-    assertExpr(head != NULL);
-    return NULL;
+    Token *head = tokens;
+    return exprParseSub(&head);
 }
 
 #endif /* end of include guard: EXPR_H */

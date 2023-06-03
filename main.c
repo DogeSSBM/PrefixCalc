@@ -11,11 +11,13 @@ int main(int argc, char **argv)
     printf("source: %s\n", source);
 
     Token *tokens = tokenize(source);
-    // tokensPrint(tokens);
     tokensCheckParens(tokens);
+    Expr *expr = exprParse(tokens);
+    free(source);
+    tokensFree(tokens);
 
-    Expr *expr = exprParseSub(&tokens);
     int result = eval(expr);
+    exprFree(expr);
     printf("result: %i\n", result);
 
     return 0;

@@ -29,6 +29,21 @@ void tokensPrint(Token *token)
     }
 }
 
+Token* tokenFree(Token *tokens)
+{
+    if(!tokens)
+        return NULL;
+    Token *next = tokens->next;
+    free(tokens);
+    return next;
+}
+
+void tokensFree(Token *tokens)
+{
+    while(tokens)
+        tokens = tokenFree(tokens);
+}
+
 bool isopr(const char c)
 {
     return c == '+' || c == '-' || c == '*' || c == '/';
