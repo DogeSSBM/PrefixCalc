@@ -1,8 +1,8 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
-typedef enum{TOK_ERR, TOK_OPR, TOK_NUM, TOK_LP, TOK_RP, TOK_END, TOK_TOKS}TokenType;
-char *TokenTypeStr[TOK_TOKS] = {"TOK_ERR", "TOK_OPR", "TOK_NUM", "TOK_LP", "TOK_RP", "TOK_END"};
+typedef enum{TOK_ERR, TOK_SYM, TOK_NUM, TOK_LP, TOK_RP, TOK_END, TOK_TOKS}TokenType;
+char *TokenTypeStr[TOK_TOKS] = {"TOK_ERR", "TOK_SYM", "TOK_NUM", "TOK_LP", "TOK_RP", "TOK_END"};
 typedef struct Token{
     TokenType type;
     const char *token;
@@ -44,9 +44,9 @@ void tokensFree(Token *tokens)
         tokens = tokenFree(tokens);
 }
 
-bool isopr(const char c)
+bool issym(const char c)
 {
-    return c == '+' || c == '-' || c == '*' || c == '/';
+    return isalpha(c) || c == '+' || c == '-' || c == '*' || c == '/';
 }
 
 Token* tokenParse(const char *source)
@@ -67,9 +67,11 @@ Token* tokenParse(const char *source)
         token->len = 1;
         return token;
     }
-    if(isopr(*source)){
-        token->type = TOK_OPR;
-        token->len = 1;
+    if(issym(*source)){
+        token->type = TOK_SYM;
+        do{
+            token->len++;
+        }while(issym(*++source));
         return token;
     }
     if(isdigit(*source)){
@@ -91,21 +93,6 @@ Token* tokenAppend(Token *head, Token *tail)
         cur = cur->next;
     cur->next = tail;
     return head;
-}
-
-Token* tokenize(const char *source)
-{
-    Token *tokens = NULL;
-    Token *token = NULL;
-    do{
-        while(isspace(*source))
-            source++;
-        token = tokenParse(source);
-        tokens = tokenAppend(tokens, token);
-        assertExprMsg(token->type != TOK_ERR, source);
-        source += token->len;
-    }while(token->type != TOK_END);
-    return tokens;
 }
 
 void tokensCheckParens(Token *token)
@@ -132,6 +119,21 @@ void tokensCheckParens(Token *token)
         printf("At: %s\n", parentLeft->token);
         exit(EXIT_FAILURE);
     }
+}
+
+Token* tokenize(const char *source)
+{
+    Token *tokens = NULL;
+    Token *token = NULL;
+    do{
+        while(isspace(*source))
+            source++;
+        token = tokenParse(source);
+        tokens = tokenAppend(tokens, token);
+        assertExprMsg(token->type != TOK_ERR, source);
+        source += token->len;
+    }while(token->type != TOK_END);
+    return tokens;
 }
 
 #endif /* end of include guard: TOKEN_H */
