@@ -3,6 +3,7 @@
 
 typedef enum{OPR_SUM, OPR_SUB, OPR_MUL, OPR_DIV, OPR_OPRS}OprType;
 char *OprTypeStr[OPR_OPRS] = {"OPR_SUM", "OPR_SUB", "OPR_MUL", "OPR_DIV"};
+char *OprTypeSym[OPR_OPRS] = {"+", "-", "*", "/"};
 
 typedef enum{EXP_OPR, EXP_NUM, EXP_EXPS}ExprType;
 char *ExprTypeStr[EXP_EXPS] = {"EXP_OPR", "EXP_NUM"};
@@ -95,6 +96,34 @@ Expr* exprParse(Token *tokens)
 {
     Token *head = tokens;
     return exprParseSub(&head);
+}
+
+void ind(const uint ind, const uint indSize)
+{
+    for(uint i = 0; i < ind * indSize; i++)
+        printf(" ");
+}
+
+void exprPrintSub(Expr *expr, uint lvl)
+{
+    while(expr){
+        ind(lvl, 4);
+        printf("type: %s, ", ExprTypeStr[expr->type]);
+        if(expr->type == EXP_OPR){
+            printf("%s (\n", OprTypeSym[expr->opr]);
+            exprPrintSub(expr->ops, lvl + 1);
+            ind(lvl, 4);
+            printf(")\n");
+        }else{
+            printf("%i\n", expr->num);
+        }
+        expr = expr->next;
+    }
+}
+
+void exprPrint(Expr *expr)
+{
+    exprPrintSub(expr, 0);
 }
 
 #endif /* end of include guard: EXPR_H */

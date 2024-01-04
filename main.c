@@ -15,7 +15,6 @@ char *getSrc(int argc, char **argv)
 
 int main(int argc, char **argv)
 {
-
     char *source = getSrc(argc, argv);
     printf("source: %s\n", source);
 
@@ -25,6 +24,7 @@ int main(int argc, char **argv)
     free(source);
     tokensFree(tokens);
 
+    exprPrint(expr);
     int result = eval(expr);
     exprFree(expr);
     printf("result: %i\n", result);
