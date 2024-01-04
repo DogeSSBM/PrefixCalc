@@ -1,9 +1,9 @@
 #ifndef EXPR_H
 #define EXPR_H
 
-typedef enum{OPR_SUM, OPR_SUB, OPR_MUL, OPR_DIV, OPR_OPRS}OprType;
-char *OprTypeStr[OPR_OPRS] = {"OPR_SUM", "OPR_SUB", "OPR_MUL", "OPR_DIV"};
-char *OprTypeSym[OPR_OPRS] = {"+", "-", "*", "/"};
+typedef enum{OPR_SUM, OPR_SUB, OPR_MUL, OPR_DIV, OPR_SRT, OPR_OPRS}OprType;
+char *OprTypeStr[OPR_OPRS] = {"OPR_SUM", "OPR_SUB", "OPR_MUL", "OPR_DIV", "OPR_SRT"};
+char *OprTypeSym[OPR_OPRS] = {"+", "-", "*", "/", "sqrt"};
 
 typedef enum{EXP_OPR, EXP_NUM, EXP_EXPS}ExprType;
 char *ExprTypeStr[EXP_EXPS] = {"EXP_OPR", "EXP_NUM"};
@@ -22,14 +22,10 @@ typedef struct Expr{
 
 OprType tokenOprType(Token *token)
 {
-    if(token->token[0] == '+')
-        return OPR_SUM;
-    if(token->token[0] == '-')
-        return OPR_SUB;
-    if(token->token[0] == '*')
-        return OPR_MUL;
-    if(token->token[0] == '/')
-        return OPR_DIV;
+    for(OprType i = 0; i < OPR_OPRS; i++){
+        if(!strncmp(token->token, OprTypeSym[i], strlen(OprTypeSym[i])))
+            return i;
+    }
     panic("uhoh");
     return 0;
 }
@@ -65,7 +61,7 @@ Expr* exprParseSub(Token **tokens)
             case TOK_NUM:;
                 char *end = NULL;
                 const ul nat = strtoul((*tokens)->token, &end, 10);
-                assertExpr(nat < 8*sizeof(int));
+                // assertExpr(nat < 8*sizeof(int));
                 expr->token = *tokens;
                 expr->type = EXP_NUM;
                 expr->num = (int)nat;
