@@ -21,6 +21,7 @@ int main(int argc, char **argv)
     Token *tokens = tokenize(source);
     tokensCheckParens(tokens);
     Expr *expr = exprParse(tokens);
+    tokensPrint(tokens);
     free(source);
     tokensFree(tokens);
 

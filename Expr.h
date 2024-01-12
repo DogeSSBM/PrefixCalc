@@ -61,7 +61,6 @@ Expr* exprParseSub(Token **tokens)
             case TOK_NUM:;
                 char *end = NULL;
                 const ul nat = strtoul((*tokens)->token, &end, 10);
-                // assertExpr(nat < 8*sizeof(int));
                 expr->token = *tokens;
                 expr->type = EXP_NUM;
                 expr->num = (int)nat;
